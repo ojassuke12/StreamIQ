@@ -12,8 +12,8 @@ class UserResponse(BaseModel):
     email: EmailStr
     name: str
 
-class Config:
-    from_attributes = True
+    class Config:
+       from_attributes = True
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -23,3 +23,19 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class MovieCreate(BaseModel):
+    title: str
+    description: str
+    poster_url: str | None = None
+    trailer_url: str | None = None
+    release_year: int
+    language: str
+    runtime: int
+    imdb_rating: float
+
+class MovieResponse(MovieCreate):
+    id: int
+
+    class Config:
+        from_attributes = True

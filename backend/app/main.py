@@ -4,11 +4,14 @@ from .auth.security import create_access_token
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from .auth.security import verify_access_token
 from fastapi import HTTPException
+from .database import engine
 
 from . import crud, schemas,models
 from .database import get_db
 
 app = FastAPI()
+
+models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -87,3 +90,74 @@ def get_me(
 ):
     return current_user
 
+@app.post("/movies", response_model=schemas.MovieResponse)
+def create_movie(
+    movie: schemas.MovieCreate,
+    db: Session = Depends(get_db)
+):
+    return crud.create_movie(
+        db,
+        movie
+    )
+
+@app.get("/movies", response_model=list[schemas.MovieResponse])
+def get_movies(
+    db: Session = Depends(get_db)
+):
+    return crud.get_movies(db)
+
+@app.get("/movies/{movie_id}", response_model=schemas.MovieResponse)
+def get_movie(
+    movie_id: int,
+    db: Session = Depends(get_db)
+):
+    movie = crud.get_movie(
+        db,
+        movie_id
+    )
+
+    if movie is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Movie not found"
+        )
+
+    return movie
+
+@app.put("/movies/{movie_id}", response_model=schemas.MovieResponse)
+def update_movie(
+    movie_id: int,
+    movie: schemas.MovieCreate,
+    db: Session = Depends(get_db)
+):
+    updated_movie = crud.update_movie(
+        db,
+        movie_id,
+        movie
+    )
+
+    if updated_movie is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Movie not found"
+        )
+
+    return updated_movie
+
+@app.delete("/movies/{movie_id}", response_model=schemas.MovieResponse)
+def delete_movie(
+    movie_id: int,
+    db: Session = Depends(get_db)
+):
+    deleted_movie = crud.delete_movie(
+        db,
+        movie_id
+    )
+
+    if deleted_movie is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Movie not found"
+        )
+
+    return deleted_movie

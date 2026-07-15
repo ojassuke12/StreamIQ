@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime,Boolean
+from sqlalchemy import Column, Integer, String, DateTime,Boolean,Text,Float
 from sqlalchemy.sql import func
 from .database import Base
 
@@ -21,3 +21,28 @@ class User(Base):
 
     is_active = Column(Boolean, default=True)
 
+class Movie(Base):
+    __tablename__ = "movies"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    title = Column(String, nullable=False)
+
+    description = Column(Text, nullable=False)
+
+    poster_url = Column(String, nullable=True)
+
+    trailer_url = Column(String, nullable=True)
+
+    release_year = Column(Integer)
+
+    language = Column(String)
+
+    runtime = Column(Integer)
+
+    imdb_rating = Column(Float)
+
+    created_at = Column(
+        DateTime,
+        server_default=func.now()
+    )
